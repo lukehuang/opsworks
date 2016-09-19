@@ -3,9 +3,14 @@
 # Recipe:: php
 #
 
+# This is an exact copy of the original opsworks recipe (https://github.com/aws/opsworks-cookbooks/blob/release-chef-11.10/deploy/recipes/php.rb)
+# except that including the two apache recipes is commented in order to prevent restarting Apache every time a new package gets deployed
+# - Fabrizio Branca, 2014/10/16
+
+
 include_recipe 'deploy'
-include_recipe "mod_php5_apache2"
-include_recipe "mod_php5_apache2::php"
+# include_recipe "mod_php5_apache2"
+# include_recipe "mod_php5_apache2::php"
 
 node[:deploy].each do |application, deploy|
   if deploy[:application_type] != 'php'
@@ -25,3 +30,11 @@ node[:deploy].each do |application, deploy|
   end
 end
 
+# Instead we're reloading Apache
+include_recipe "apache2::service"
+
+execute "reload apache" do
+  command "echo 'Reloading Apache now'"
+  action :run
+  notifies :reload, "service[apache2]", :delayed
+end

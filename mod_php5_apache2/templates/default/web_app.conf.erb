@@ -6,10 +6,12 @@
   DocumentRoot <%= @params[:docroot] %>
 
   <Directory <%= @params[:docroot] %>>
-    Options FollowSymLinks
-    AllowOverride All
+    Options <%= node[:apache][:options] || "FollowSymLinks" %>
+    AllowOverride <%= node[:apache][:allow_override] || "All" %>
     Order allow,deny
     Allow from all
+
+    IncludeOptional <%= File.dirname(@params[:local_config]) %>/docroot-*
   </Directory>
 
   <Directory ~ "\.svn">
@@ -22,10 +24,12 @@
     Deny from all
   </Directory>
 
+  LogFormat "\"%{X-Forwarded-For}i\" %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" combined-elb
+
   LogLevel <%= node[:apache][:log_level] %>
   ErrorLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-error.log
-  CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-access.log combined
-  CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-ganglia.log ganglia
+  CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-access.log combined-elb
+  # CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-ganglia.log ganglia
 
   FileETag none
 
@@ -51,6 +55,9 @@
   <% else -%>
   IncludeOptional <%= @params[:local_config] %>*
   <% end -%>
+
+  php_value error_log <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-php-error.log
+
 </VirtualHost>
 
 <% if node[:deploy][@application_name][:ssl_support] -%>
@@ -71,8 +78,8 @@
   SetEnvIf User-Agent ".*MSIE.*" nokeepalive ssl-unclean-shutdown downgrade-1.0 force-response-1.0
 
   <Directory <%= @params[:docroot] %>>
-    Options FollowSymLinks
-    AllowOverride All
+    Options <%= node[:apache][:options] ||= "FollowSymLinks" %>
+    AllowOverride <%= node[:apache][:allow_override] ||= "All" %>
     Order allow,deny
     Allow from all
   </Directory>
@@ -87,10 +94,12 @@
     Deny from all
   </Directory>
 
+  LogFormat "\"%{X-Forwarded-For}i\" %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" combined-elb
+
   LogLevel <%= node[:apache][:log_level] %>
   ErrorLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-error.log
-  CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-ssl-access.log combined
-  CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-ssl-ganglia.log ganglia
+  CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-ssl-access.log combined-elb
+  # CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-ssl-ganglia.log ganglia
 
   FileETag none
 
@@ -116,5 +125,8 @@
   <% else -%>
   IncludeOptional <%= @params[:local_config] %>-ssl*
   <% end -%>
+
+  php_value error_log <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-php-error.log
+
 </VirtualHost>
 <% end -%>
