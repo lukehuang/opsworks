@@ -11,11 +11,11 @@
 Chef::Log.info("Recipe magentostack::setup")
 
 # Add user 'ubuntu' to group 'www-data'
-group 'www-data' do
-  action :modify
-  members 'ubuntu'
-  append true
-end
+#group 'www-data' do
+#  action :modify
+#  members 'ubuntu'
+#  append true
+#end
 
 execute "install mcrypt" do
   command "php5enmod mcrypt"
