@@ -8,6 +8,11 @@
 #
 
 execute "install" do
+ 	command "apt-get install -y libpcre3-dev"
+	command "add-apt-repository -y ppa:ubuntu-toolchain-r/test"
+	command "apt-get update"
+	command "apt-get install gcc-4.9 g++-4.9"
+	command "update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9"
 	command "apt-get install apt-transport-https"
         command "curl https://repo.varnish-cache.org/GPG-key.txt | apt-key add -echo 'deb https://repo.varnish-cache.org/debian/ jessie varnish-4.1'\
     >> /etc/apt/sources.list.d/varnish-cache.list"
