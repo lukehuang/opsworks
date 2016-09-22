@@ -16,6 +16,7 @@ execute "install" do
 	command "sudo apt-get install -y apt-transport-https"
         command "curl https://repo.varnish-cache.org/GPG-key.txt | apt-key add -echo 'deb https://repo.varnish-cache.org/debian/ jessie varnish-4.1'\
     >> /etc/apt/sources.list.d/varnish-cache.list"
+	command "echo 'deb http://security.ubuntu.com/ubuntu wily-security main' >> /etc/apt/sources.list"
 	command "apt-get update"
 	command "apt-get install -y varnish"
 end
